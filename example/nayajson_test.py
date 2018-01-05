@@ -1,11 +1,12 @@
 from io import StringIO
 import json
 import unittest
+import timeout_decorator
 
 class TestJsonTokenization(unittest.TestCase):
 
     def tokenize_sequence(self, string):
-        return [token for token in mynayajson.tokenize(StringIO(string))]
+        return [token for token in nayajson.tokenize(StringIO(string))]
 
     def tokenize_single_token(self, string):
         token_list = self.tokenize_sequence(string)
@@ -18,21 +19,21 @@ class TestJsonTokenization(unittest.TestCase):
         self.assertEqual(1, len(token_list))
         ttype, token = token_list[0]
         self.assertEqual(expected, token)
-        self.assertEqual(ttype, mynayajson.TOKEN_TYPE.NUMBER)
+        self.assertEqual(ttype, nayajson.TOKEN_TYPE.NUMBER)
 
     def assertOperatorEquals(self, expected, actual):
 
         token_list = self.tokenize_sequence(actual)
         ttype, token = token_list[0]
         self.assertEqual(expected, token)
-        self.assertEqual(ttype, mynayajson.TOKEN_TYPE.OPERATOR)
+        self.assertEqual(ttype, nayajson.TOKEN_TYPE.OPERATOR)
 
     def assertStringEquals(self, expected, actual):
-        token_list = [token for token in mynayajson.tokenize(StringIO('"{}"'.format(actual)))]
+        token_list = [token for token in nayajson.tokenize(StringIO('"{}"'.format(actual)))]
         self.assertEqual(1, len(token_list))
         ttype, token = token_list[0]
         self.assertEqual(expected, token)
-        self.assertEqual(ttype, mynayajson.TOKEN_TYPE.STRING)
+        self.assertEqual(ttype, nayajson.TOKEN_TYPE.STRING)
 
     def test_number_parsing(self):
         self.assertNumberEquals(0, "0")
@@ -85,7 +86,7 @@ class TestJsonTokenization(unittest.TestCase):
         self.assertRaises(ValueError, self.tokenize_single_token, "\"\\u!\"")
 
     def test_sequence(self):
-        result = [token for token in mynayajson.tokenize(StringIO("123 \"abc\":{}"))]
+        result = [token for token in nayajson.tokenize(StringIO("123 \"abc\":{}"))]
         self.assertEqual(result, [(2, 123), (1, 'abc'), (0, ':'), (0, '{'), (0, '}')])
 
         # Borrowed from http://en.wikipedia.org/wiki/JSON
@@ -114,7 +115,7 @@ class TestJsonTokenization(unittest.TestCase):
           "children": [],
           "spouse": null
         }"""
-        result = [token for token in mynayajson.tokenize(StringIO(big_file))]
+        result = [token for token in nayajson.tokenize(StringIO(big_file))]
         expected = [(0, '{'), (1, 'firstName'), (0, ':'), (1, 'John'), (0, ','), (1, 'lastName'), (0, ':'),
                     (1, 'Smith'), (0, ','), (1, 'isAlive'), (0, ':'), (3, True), (0, ','), (1, 'age'), (0, ':'),
                     (2, 25), (0, ','), (1, 'height_cm'), (0, ':'), (2, 167.6), (0, ','), (1, 'address'), (0, ':'),
@@ -130,33 +131,33 @@ class TestJsonTokenization(unittest.TestCase):
                             's":{"streetAddress":"21 2nd Street","city":"New York","state":"NY","postalCode":"10021-3' \
                             '100"},"phoneNumbers":[{"type":"home","number":"212 555-1234"},{"type":"office","number":' \
                             '"646 555-4567"}],"children":[],"spouse":null}'
-        result = [token for token in mynayajson.tokenize(StringIO(big_file_no_space))]
+        result = [token for token in nayajson.tokenize(StringIO(big_file_no_space))]
         self.assertListEqual(result, expected)
-        result = [token for token in mynayajson.tokenize(StringIO("854.6,123"))]
+        result = [token for token in nayajson.tokenize(StringIO("854.6,123"))]
         self.assertEqual(result, [(2, 854.6), (0, ','), (2, 123)])
         self.assertRaises(ValueError, self.tokenize_sequence, "123\"text\"")
         self.assertRaises(ValueError, self.tokenize_sequence, "23.9e10true")
         self.assertRaises(ValueError, self.tokenize_sequence, "\"test\"56")
 
     def test_arrays(self):
-        arr = mynayajson.parse_string('[]')
+        arr = nayajson.parse_string('[]')
         self.assertListEqual(arr, [])
-        arr = mynayajson.parse_string('["People", "Places", "Things"]')
+        arr = nayajson.parse_string('["People", "Places", "Things"]')
         self.assertListEqual(arr, ["People", "Places", "Things"])
-        arr = mynayajson.parse_string('["Apples", "Bananas", ["Pears", "Limes"]]')
+        arr = nayajson.parse_string('["Apples", "Bananas", ["Pears", "Limes"]]')
         self.assertListEqual(arr, ["Apples", "Bananas", ["Pears", "Limes"]])
-        self.assertRaises(ValueError, mynayajson.parse_string, '["People", "Places", "Things"')
-        self.assertRaises(ValueError, mynayajson.parse_string, '["People", "Places" "Things"]')
-        self.assertRaises(ValueError, mynayajson.parse_string, '["People", "Places"] "Things"]')
+        self.assertRaises(ValueError, nayajson.parse_string, '["People", "Places", "Things"')
+        self.assertRaises(ValueError, nayajson.parse_string, '["People", "Places" "Things"]')
+        self.assertRaises(ValueError, nayajson.parse_string, '["People", "Places"] "Things"]')
 
     def test_objects(self):
-        obj = mynayajson.parse_string('{"key1":"value1"}')
+        obj = nayajson.parse_string('{"key1":"value1"}')
         self.assertDictEqual(obj, {"key1": "value1"})
 
-        obj = mynayajson.parse_string("{}")
+        obj = nayajson.parse_string("{}")
         self.assertDictEqual(obj, {})
 
-        obj = mynayajson.parse_string('{"name": {"first":"Daniel", "last": "Yule"}}')
+        obj = nayajson.parse_string('{"name": {"first":"Daniel", "last": "Yule"}}')
         self.assertDictEqual(obj, {"name": {"first": "Daniel", "last": "Yule"}})
 
         # Borrowed from http://en.wikipedia.org/wiki/JSON
@@ -185,7 +186,7 @@ class TestJsonTokenization(unittest.TestCase):
           "children": [],
           "spouse": null
         }"""
-        obj = mynayajson.parse_string(big_file)
+        obj = nayajson.parse_string(big_file)
         self.assertDictEqual(obj, {
             "firstName": "John",
             "lastName": "Smith",
@@ -212,30 +213,30 @@ class TestJsonTokenization(unittest.TestCase):
             "spouse": None
         })
 
-        self.assertRaises(ValueError, mynayajson.parse_string, "{")
-        self.assertRaises(ValueError, mynayajson.parse_string, '{"key": "value"')
-        self.assertRaises(ValueError, mynayajson.parse_string, '{"key": "value"}}')
-        self.assertRaises(ValueError, mynayajson.parse_string, '{"key": "value", "value2"}')
-        self.assertRaises(ValueError, mynayajson.parse_string, '{"key", "value": "value2"}')
-        self.assertRaises(ValueError, mynayajson.parse_string, '{"key", "value": "value2"]}')
-        self.assertRaises(ValueError, mynayajson.parse_string, '{"key", "value": "value2" []}')
-        self.assertRaises(ValueError, mynayajson.parse_string, '{"key", "value": ["value2"]}')
+        self.assertRaises(ValueError, nayajson.parse_string, "{")
+        self.assertRaises(ValueError, nayajson.parse_string, '{"key": "value"')
+        self.assertRaises(ValueError, nayajson.parse_string, '{"key": "value"}}')
+        self.assertRaises(ValueError, nayajson.parse_string, '{"key": "value", "value2"}')
+        self.assertRaises(ValueError, nayajson.parse_string, '{"key", "value": "value2"}')
+        self.assertRaises(ValueError, nayajson.parse_string, '{"key", "value": "value2"]}')
+        self.assertRaises(ValueError, nayajson.parse_string, '{"key", "value": "value2" []}')
+        self.assertRaises(ValueError, nayajson.parse_string, '{"key", "value": ["value2"]}')
 
     def test_array_stream(self):
-        arr = mynayajson.stream_array(mynayajson.tokenize(StringIO('[]')))
+        arr = nayajson.stream_array(nayajson.tokenize(StringIO('[]')))
         self.assertListEqual([i for i in arr], [])
-        arr = mynayajson.stream_array(mynayajson.tokenize(StringIO('["People", "Places", "Things"]')))
+        arr = nayajson.stream_array(nayajson.tokenize(StringIO('["People", "Places", "Things"]')))
         self.assertListEqual([i for i in arr], ["People", "Places", "Things"])
-        arr = mynayajson.stream_array(mynayajson.tokenize(StringIO('["Apples", "Bananas", ["Pears", "Limes"]]')))
+        arr = nayajson.stream_array(nayajson.tokenize(StringIO('["Apples", "Bananas", ["Pears", "Limes"]]')))
         self.assertListEqual([i for i in arr], ["Apples", "Bananas", ["Pears", "Limes"]])
-        arr = mynayajson.stream_array(mynayajson.tokenize(StringIO('["Apples", ["Pears", "Limes"], "Bananas"]')))
+        arr = nayajson.stream_array(nayajson.tokenize(StringIO('["Apples", ["Pears", "Limes"], "Bananas"]')))
         self.assertListEqual([i for i in arr], ["Apples", ["Pears", "Limes"], "Bananas"])
 
     #def test_large_sample(self):
     #    with open("tests/sample.json", "r", encoding="utf-8") as file:
     #        obj2 = json.load(file)
     #    with open("tests/sample.json", "r", encoding="utf-8") as file:
-    #        obj = mynayajson.parse(file)
+    #        obj = nayajson.parse(file)
 
     #    self.assertDictEqual(obj, obj2)
 
@@ -252,6 +253,8 @@ def suite():
     #def test_large_sample(self):
     return suite
 
+@timeout_decorator.timeout(10)
 def runTest():
-    runner = unittest.TextTestRunner(verbosity=0, stream=StringIO(), failfast=True)
-    return runner.run(suite()).wasSuccessful()
+    #runner = unittest.TextTestRunner(verbosity=0, stream=StringIO(), failfast=True)
+    runner = unittest.TextTestRunner(failfast=True)
+    return runner.run(suite())
