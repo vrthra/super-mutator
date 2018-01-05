@@ -4,7 +4,7 @@ import mutate as mu
 import ddmin as dd
 import imp
 import sys
-import nayajson_test
+import os.path
 
 def import_code(code, name):
     module = imp.new_module(name)
@@ -20,17 +20,24 @@ def evalmutant(mname, mutant, test):
         return False # Mutant Not Found
 
 def main(args):
-    num_statements = counter.get_statements(open('example/nayajson.py').read())
-    mynayajson_src = open('example/nayajson.py').read()
-    nayajson_test = import_code(open('example/nayajson_test.py').read(), 'nayajson_test')
+    mainfile = args[0]
+    mainname = os.path.splitext(os.path.basename(mainfile))[0]
+    mainsrc = open(mainfile).read()
+
+    num_statements = counter.get_statements(mainsrc)
+
+    testfile = args[1]
+    testname = os.path.splitext(os.path.basename(testfile))[0]
+    testsrc = open(testfile).read()
+    test_code = import_code(testsrc, testname)
 
     def mytest(lst_locations):
-        mutant_src = mu.gen_mutant(mynayajson_src, lst_locations)
-        mutant = import_code(mutant_src, 'mynayajson')
-        return evalmutant('mynayajson', mutant, nayajson_test)
+        mutant_src = mu.gen_mutant(mainsrc, lst_locations)
+        mutant = import_code(mutant_src, mainname)
+        return evalmutant(mainname, mutant, test_code)
 
     mutate_lst = list(range(1, num_statements+1))
     r = dd.ddmin(mutate_lst, mytest)
     print(r)
 
-main(sys.argv)
+main(sys.argv[1:])
