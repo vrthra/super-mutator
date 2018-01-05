@@ -5,19 +5,23 @@ import minimize as m
 import imp
 import sys
 import os.path
+import timeout_decorator
 
 def import_code(code, name):
     module = imp.new_module(name)
     exec(code, module.__dict__)
     return module
 
+global nexecutions
+nexecutions = 0
+
+@timeout_decorator.timeout(1)
 def evalmutant(mname, mutant, test):
+    global nexecutions
+    nexecutions += 1
     test.__dict__[mname] = mutant
-    #try:
     v = test.runTest() # Was test run successful? False -- Mutant Found
-    return not v
-    #except:
-    #    return True # Syntax Error? Mutant found
+    return not v.wasSuccessful()
 
 def main(args):
     mainfile = args[0]
@@ -32,7 +36,6 @@ def main(args):
     test_code = import_code(testsrc, testname)
 
     def mytest(lst_locations):
-        print(lst_locations)
         try:
             mutant_src = mu.gen_mutant(mainsrc, lst_locations)
             mutant = import_code(mutant_src, mainname)
@@ -46,5 +49,6 @@ def main(args):
     composite_list = [r[x:x+10] for x in range(0, len(r),10)]
     for i in composite_list:
         print(i)
+    print('Total executions: ', nexecutions, ' for ', len(mutate_lst), ' muscore = ', len(r)/len(mutate_lst))
 
 main(sys.argv[1:])

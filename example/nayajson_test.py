@@ -1,7 +1,6 @@
 from io import StringIO
 import json
 import unittest
-import timeout_decorator
 
 class TestJsonTokenization(unittest.TestCase):
 
@@ -253,8 +252,6 @@ def suite():
     #def test_large_sample(self):
     return suite
 
-@timeout_decorator.timeout(10)
 def runTest():
-    #runner = unittest.TextTestRunner(verbosity=0, stream=StringIO(), failfast=True)
-    runner = unittest.TextTestRunner(failfast=True)
+    runner = unittest.TextTestRunner(verbosity=0, stream=StringIO(), failfast=True)
     return runner.run(suite())
