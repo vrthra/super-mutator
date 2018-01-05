@@ -46,8 +46,13 @@ def minimize(s, fn):
         r = list(sum([v if len(v) == 1 else minimize(v, fn) for v in detected_mutations_llst], []))
         return r
     elif len(detected_mutations_llst) == 0:
-        # if a combined mutation mutant failed, but mutants with individual mutations did not, what should we do?
-
+        # if a combined mutation mutant failed, but mutants with individual mutations did not.
+        # Here, we may save the failed mutant for further analysis, because it
+        # is more likely that the component mutations are non-equivalent but for
+        # the purpose of mutation analysis, it is sufficient to note that the
+        # children did not have failing faults, and hence their children are
+        # also unlikely to have failing faults.
+        return []
     else: assert False
 
 
