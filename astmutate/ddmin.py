@@ -11,30 +11,60 @@ import string
 
 def complement(s, i, l): return s[:i] + s[i + l:]
 
-def some_complement_is_failing(s, npartitions, testfn):
+def all_complements_failing(s, npartitions, testfn):
     subset_length = len(s) // npartitions
-    items = range(0,len(s), subset_length)
+    items = range(0,len(s)-1, subset_length)
     complements = [complement(s, i, subset_length) for i in items]
-    for i in complements:
-        if testfn(i):
-            return i
-    return None
+    return [i for i in complements if testfn(i)] # return all complements, not just first
 
 def update_input(s, npartitions, fn):
-    v = some_complement_is_failing(s, npartitions, fn)
+    v = all_complements_failing(s, npartitions, fn)
     if v:
         return v, max(npartitions - 1, 2)
     else:
-        return s, min(npartitions * 2, len(s))
+        return [s], min(npartitions * 2, len(s))
 
-def ddmin(s, fn):
+def minimize(s, fn):
+    # split the input into two, and check each.
+    detected_mutations_llst = split_into_two_and_check(s, fn)
+
+    if len(detected_mutations_llst) == 1:
+        # if the detected is just one part, we are happy.
+        # we can do a single track descent into that part.
+        detected_mutations_lst = detected_mutations_llst[0]
+
+        # if we are at single mutant level, return
+        if len(detected_mutations_lst) == 1: return detected_mutations_lst
+
+        # more to do. continue
+        return minimize(detected_mutations_lst, fn)
+
+    elif len(detected_mutations_llst) == 2:
+        # if both parts detected mutants, then we need to
+        # isolate mutants both
+        detected_mutations_lst1, detected_mutations_lst2 = detected_mutations_llst
+        r = list(sum([v if len(v) == 1 else minimize(v, fn) for v in detected_mutations_llst], []))
+        return r
+    elif len(detected_mutations_llst) == 0:
+        # if a combined mutation mutant failed, but mutants with individual mutations did not, what should we do?
+
+    else: assert False
+
+
+
     npartitions = 2
-    while s:
-        s, n1 = update_input(s, npartitions, fn)
+    lst = [s]
+    collected = []
+    while lst:
+        s, *lst = lst
+        newlst, n1 = update_input(s, npartitions, fn)
         # npartitions is the number of partitions. We stop when the number of partitions
         # equal the number of individual elements.
-        if npartitions == len(s): break
+        if len(newlst) == 1 && npartitions == len(newlst[0]):
+            collected.append(newlst[0])
+            continue
         npartitions = n1
+        lst.extend(newlst)
     return s
 
 
