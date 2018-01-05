@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import counter as counter
 import mutate as mu
-import ddmin as dd
+import minimize as m
 import imp
 import sys
 import os.path
@@ -34,7 +34,7 @@ def main(args):
         return evalmutant(mainname, mutant, test_code)
 
     mutate_lst = sorted(list(range(1, num_statements+1)))
-    r = dd.ddmin(mutate_lst, mytest)
+    r = m.minimize(mutate_lst, mytest)
     print(r)
 
 main(sys.argv[1:])
