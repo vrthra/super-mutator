@@ -4,16 +4,16 @@ from io import StringIO
 
 class TestTriangle(unittest.TestCase):
 
-    def test_equilateral():
-        assert triangle(1,1,1) == 'Equilateral'
+    def test_equilateral(self):
+        assert triangle.triangle(1,1,1) == 'Equilateral'
 
-    def test_isosceles():
-        assert triangle(1,2,1) == 'Isosceles'
-        assert triangle(2,2,1) == 'Isosceles'
-        assert triangle(2,1,2) == 'Isosceles'
+    def test_isosceles(self):
+        assert triangle.triangle(1,2,1) == 'Isosceles'
+        assert triangle.triangle(2,2,1) == 'Isosceles'
+        assert triangle.triangle(1,2,2) == 'Isosceles'
 
-    def test_scalene():
-        assert triangle(1,2,3) == 'Scalene'
+    def test_scalene(self):
+        assert triangle.triangle(1,2,3) == 'Scalene'
 
 def suite():
     suite = unittest.TestSuite()
@@ -23,6 +23,6 @@ def suite():
     return suite
 
 def runTest():
-    runner = unittest.TextTestRunner(verbosity=0, stream=StringIO(), failfast=True)
+    runner = unittest.TextTestRunner(verbosity=0, failfast=True)
     return runner.run(suite())
 

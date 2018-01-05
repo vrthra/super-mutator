@@ -39,7 +39,11 @@ def main(args):
         try:
             mutant_src = mu.gen_mutant(mainsrc, lst_locations)
             mutant = import_code(mutant_src, mainname)
-            return evalmutant(mainname, mutant, test_code)
+            r =  evalmutant(mainname, mutant, test_code)
+            #if not r:
+            #    with open(mainfile + '_mutant_' + '_'.join([str(i) for i in lst_locations]) + '.py', 'w+') as a:
+            #        print(mutant_src,file=a)
+            return r
         except SyntaxError:
             print('Syntax!', lst_locations)
             return True
