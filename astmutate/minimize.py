@@ -8,6 +8,14 @@ import string
 # if both succeeds, then we have to descent into both.
 # if none succeeds, then we do the ddmin thing and increase the coarseness
 
+def complement(s, i, l): return s[:i] + s[i + l:]
+
+def split_into_two_and_check(s, fn):
+    subset_length = len(s) // 2
+    items = range(0,len(s)-1, subset_length)
+    complements = [complement(s, i, subset_length) for i in items]
+    return [i for i in complements if fn(i)]
+
 def minimize(s, fn):
     # split the input into two, and check each.
     detected_mutations_llst = split_into_two_and_check(s, fn)
@@ -24,9 +32,7 @@ def minimize(s, fn):
         return minimize(detected_mutations_lst, fn)
 
     elif len(detected_mutations_llst) == 2:
-        # if both parts detected mutants, then we need to
-        # isolate mutants both
-        detected_mutations_lst1, detected_mutations_lst2 = detected_mutations_llst
+        # if both parts detected mutants, then we need to isolate mutants in both
         r = list(sum([v if len(v) == 1 else minimize(v, fn) for v in detected_mutations_llst], []))
         return r
     elif len(detected_mutations_llst) == 0:
