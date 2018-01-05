@@ -13,11 +13,15 @@ def import_code(code, name):
 
 def evalmutant(mname, mutant, test):
     test.__dict__[mname] = mutant
-    v = test.runTest()
-    if len(v.errors) > 0 or len(v.failures) > 0:
-        return True # Mutant Found
-    else:
-        return False # Mutant Not Found
+    v = test.runTest() # Was test run successful? False -- Mutant Found
+    # our use of ddmin.
+    # if the mutant fails in one of the test cases, we are happy (TODO: Threats -- we are not ensuring same test case fails.)
+    # we split the mutations in the mutants into two, and evaluate both.
+    # if at least one succeeds, then it is great, we descent into that.
+    # if both succeeds, then we have to descent into both.
+    # if none succeeds, then we do the ddmin thing and increase the coarseness
+
+    return not v
 
 def main(args):
     mainfile = args[0]
@@ -36,7 +40,7 @@ def main(args):
         mutant = import_code(mutant_src, mainname)
         return evalmutant(mainname, mutant, test_code)
 
-    mutate_lst = list(range(1, num_statements+1))
+    mutate_lst = sorted(list(range(1, num_statements+1)))
     r = dd.ddmin(mutate_lst, mytest)
     print(r)
 

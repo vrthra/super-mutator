@@ -253,5 +253,5 @@ def suite():
     return suite
 
 def runTest():
-    runner = unittest.TextTestRunner()
-    return runner.run(suite())
+    runner = unittest.TextTestRunner(verbosity=0, stream=StringIO(), failfast=True)
+    return runner.run(suite()).wasSuccessful()
