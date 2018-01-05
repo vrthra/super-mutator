@@ -13,8 +13,11 @@ def import_code(code, name):
 
 def evalmutant(mname, mutant, test):
     test.__dict__[mname] = mutant
+    #try:
     v = test.runTest() # Was test run successful? False -- Mutant Found
     return not v
+    #except:
+    #    return True # Syntax Error? Mutant found
 
 def main(args):
     mainfile = args[0]
@@ -29,12 +32,19 @@ def main(args):
     test_code = import_code(testsrc, testname)
 
     def mytest(lst_locations):
-        mutant_src = mu.gen_mutant(mainsrc, lst_locations)
-        mutant = import_code(mutant_src, mainname)
-        return evalmutant(mainname, mutant, test_code)
+        print(lst_locations)
+        try:
+            mutant_src = mu.gen_mutant(mainsrc, lst_locations)
+            mutant = import_code(mutant_src, mainname)
+            return evalmutant(mainname, mutant, test_code)
+        except SyntaxError:
+            print('Syntax!', lst_locations)
+            return True
 
     mutate_lst = sorted(list(range(1, num_statements+1)))
     r = m.minimize(mutate_lst, mytest)
-    print(r)
+    composite_list = [r[x:x+10] for x in range(0, len(r),10)]
+    for i in composite_list:
+        print(i)
 
 main(sys.argv[1:])
