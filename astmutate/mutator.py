@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+
+# TODO:
+# * No need to evaluate all tests for each partition. Only those tests that
+#  failed for the parent partition is sufficient.
+# * Use ddmin once we find child partitions such that none of them are detected
+#   so that we will get a subtle HOM
 import counter as counter
 import mutate as mu
 import minimize as m
